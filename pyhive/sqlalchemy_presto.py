@@ -68,12 +68,17 @@ class PrestoDialect(default.DefaultDialect):
     def dbapi(cls):
         return presto
 
+    def __init__(self, session_props=None, **kwargs):
+        default.DefaultDialect.__init__(self, **kwargs)
+        self.session_props = session_props
+
     def create_connect_args(self, url):
         db_parts = (url.database or 'hive').split('/')
         kwargs = {
             'host': url.host,
             'port': url.port or 8080,
             'username': url.username,
+            'session_props': self.session_props,
         }
         kwargs.update(url.query)
         if len(db_parts) == 1:
